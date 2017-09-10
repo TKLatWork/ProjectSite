@@ -31,11 +31,15 @@
     </dependencies>
 
     <build>
+        <!-- TODO 把res目录打包进去target -->
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${props.spring-boot-maven-plugin.version}</version>
+                <configuration>
+                    <finalName>${project.build.finalName}-dist</finalName>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
