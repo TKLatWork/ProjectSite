@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: siteFrontend
+
+server.port: 80
