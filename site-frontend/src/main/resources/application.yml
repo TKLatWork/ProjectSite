@@ -2,4 +2,6 @@ spring:
   application:
     name: siteFrontend
 
-server.port: 80
+server:
+  port: 80
+  contextPath: /site
