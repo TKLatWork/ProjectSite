@@ -1,0 +1,48 @@
+<div id="layout-right" class="col-xs-6 col-sm-4" ng-show="ifShowRight">
+    <h5>Right</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+    </ul>
+</div>
+
+<div id="layout-center">
+    <div>
+        <p>Record Info</p>
+        <form class="form-inline">
+            
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Name" ng-model="record.name">
+            <input type="text" class="form-control" placeholder="Category" ng-model="record.category">
+            
+
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="New Tag" ng-model="input.newTag">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="onAddTag()">Add</button>
+              </span>
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="onRemoveTag()">Remove</button>
+              </span>
+            </div>  
+            <!-- tags and tag input -->
+            <button class="btn btn-info" ng-repeat="tag in record.tags">{{tag}}</button>
+            
+            <div>
+                <!-- visibility -->
+                <label><input type="checkbox" ng-model="input.isPrivate">isPrivate</label>
+                <!-- recordType -->
+                <label><input type="checkbox" ng-model="input.isFile">isFile</label>
+            </div>
+          </div>
+        </form>
+        <button type="submit" class="btn btn-default" ng-click="onSave()">Save</button>
+    </div>
+    
+    <div>
+        <p>Record Info</p>
+        <div>{{record.content}}</div>
+    </div>
+</div>
+

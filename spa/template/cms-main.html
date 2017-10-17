@@ -1,0 +1,41 @@
+<div id="layout-right" class="col-xs-6 col-sm-4" ng-show="ifShowRight">
+    <h5>Right</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+    </ul>
+</div>
+
+<div id="layout-center">
+    <div>
+        <p>Search</p>
+        <form class="form-inline">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Name" ng-model="query.name">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Category" ng-model="query.category">
+          </div>
+          <button type="submit" class="btn btn-default" ng-click="onSearch()">Search</button>
+        </form>
+    </div>
+    
+    <div ng-show="searchResult">
+        <span class="pull-left bs-text">Total {{searchResult.totalPages}} Pages, {{searchResult.totalElements}} Result</span>
+        
+        <nav aria-label="...">
+          <ul class="pager">
+            <li class="previous"><button class="btn btn-default" ng-click="onMovePage(-1)"><span aria-hidden="true">&larr;</span> Prev</button></li>
+            <li><a>{{searchResult.number}}</a></li>
+            <li class="next"><button class="btn btn-default" ng-click="onMovePage(1)">Next <span aria-hidden="true">&rarr;</span></button></li>
+          </ul>
+        </nav>
+        
+        <ul class="list-group" ng-repeat="record in searchResult.content">
+            <li class="list-group-item">{{record.name}} {record.category}</li>
+        </ul>
+    </div>
+</div>
+
+

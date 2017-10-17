@@ -2,6 +2,24 @@ spring:
   application:
     name: siteFrontend
 
+  data.mongodb:
+    database: site
+
+
+  resources:
+    chain:
+    #TODO md5 versioning ?
+      strategy.content:
+        enabled: true
+        paths: /*,/static/**
+
 server:
   port: 80
   contextPath: /site
+
+logging.level.root: DEBUG
+
+app.siteFrontend:
+  appConfig:
+    adminUserName: tkl
+    adminPassword: 123

@@ -1,0 +1,41 @@
+#layout-right, #layout-bottom, #layout-top{
+    background-color: white;
+    border: 2px solid;
+}
+
+#layout-bottom{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: right;
+}
+
+#layout-top{
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#layout-right{
+    position: fixed;
+    right: 0;
+    top: 2em;
+}
+
+#layout-center{
+    margin-bottom: 2em;
+    margin-top: 2em;
+} 
+
+.long-btn{
+    width: 20%;
+ }
+    
+.bs-text{
+    margin: 0.25em;
+    line-height: 2.2em;
+}
+
+.clean-bottom-margin{
+    margin-bottom: 0;
+}
