@@ -14,6 +14,7 @@ app.factory("AppService", function($rootScope){
         getUser : function(){return data.user},
         setUser : function(userInfo){
             data.user = userInfo;
+            $rootScope.$emit(Consts.Event.UserChange, data.user);
         },
         getRecord : function(){return data.record},
         setRecord : function(recordInfo){

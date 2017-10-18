@@ -1,11 +1,13 @@
 package my.web.site.siteFrontend.cms.api;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import my.web.site.commons.cms.dao.RecordRepo;
 import my.web.site.commons.cms.model.Record;
 import my.web.site.commons.cms.util.CmsUtil;
 import my.web.site.commons.cms.vals.ConstValues;
 import my.web.site.commons.commons.CommonResponse;
 import my.web.site.commons.commons.CommonResponseBuilder;
+import my.web.site.commons.commons.FileUploadResponse;
 import my.web.site.commons.user.model.UserInfo;
 import my.web.site.siteFrontend.cms.entity.CmsServiceException;
 import my.web.site.siteFrontend.cms.entity.NotFoundException;
@@ -48,6 +50,7 @@ public class CmsApiCtrl {
     public static final String RECORD_GET = "/public/record";
     public static final String RECORD_PRIVATE = "/private/record";
     public static final String FILE_GET = "/public/file";
+    public static final String FILE_BROWSER = "/private/fileBrowser";
     public static final String FILE_PRIVATE = "/private/file";
 
     @Autowired
@@ -124,7 +127,7 @@ public class CmsApiCtrl {
     }
 
     //record CURD
-    @RequestMapping(path = RECORD_GET, method = RequestMethod.GET)
+    @RequestMapping(path = RECORD_GET, method = RequestMethod.POST)
     @ResponseBody
     public CommonResponse recordGet(@RequestBody Record request) {
         if (request.getId() == null) {
@@ -166,7 +169,7 @@ public class CmsApiCtrl {
             request.setCreateDate(System.currentTimeMillis());
         }
         request.setLastModifyDate(System.currentTimeMillis());
-        //类型限制, 文件上传id置空
+        //类型限制, 文件上传id置空//TODO file不会在这
         if(request.getRecordType() != ConstValues.RecordType.File || request.getId() == null){
             request.setBlobId(null);
         }
@@ -212,30 +215,54 @@ public class CmsApiCtrl {
         return gridFsTemplate.getResource(fileName);
     }
 
-    @PostMapping(FILE_PRIVATE + "/{recordId}")
+    @RequestMapping(path = FILE_BROWSER)
+    public String fileBrowser(@RequestParam("CKEditorFuncNum") String funcNum) throws MissingServletRequestParameterException {
+        UserInfo userInfo = userApiUtil.getUserInfoFromContext();
+
+        Page<Record> recordPage = recordRepo.findByUserIdAndRecordType(userInfo.getId(), ConstValues.RecordType.File, new PageRequest(0, 1));
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("<script type=\"text/javascript\">");
+        Boolean toSet = true;
+
+        recordPage.forEach( r ->{
+            if(r.getRecordType() == ConstValues.RecordType.File && toSet){
+                builder.append("window.opener.CKEDITOR.tools.callFunction(" + funcNum + ",'" + "/site/cms/public/file/" + r.getBlobId() + "');");
+            }
+        });
+
+        builder.append("</script>");
+
+        return builder.toString();
+    }
+
+    @PostMapping(FILE_PRIVATE)
     @ResponseBody
-    public CommonResponse fileUpdate(@PathVariable String recordId, @RequestParam("file") MultipartFile file) throws IOException {
-        Record record = recordRepo.findOne(recordId);
-        if(record == null){
-            throw new CmsServiceException("Can not find record:" + recordId);
-        }
-        if(!canModify(record)){
-            throw new CmsServiceException("Not your record:" + recordId);
-        }
-        if(StringUtils.isNoneBlank(record.getBlobId())){
-            throw new CmsServiceException("Used record:" + record.getBlobId());
-        }
+    public String fileUpdate(@RequestParam("upload") MultipartFile file, @RequestParam("CKEditorFuncNum") String funcNum) throws IOException {
         if(file.isEmpty()){
             throw new CmsServiceException("File is empty");//TODO 需要返回错误原因
         }
+        UserInfo userInfo = userApiUtil.getUserInfoFromContext();
+
+        Record record = new Record();
+        record.setName(file.getOriginalFilename());
+        record.setUsername(userInfo.getUsername());
+        record.setUserId(userInfo.getId());
+        record.setRecordType(ConstValues.RecordType.File);
+        record.setVisibility(ConstValues.Visibility.Public);
 
         String finalName = CmsUtil.genFileName(file.getOriginalFilename());
         gridFsTemplate.store(new ByteArrayInputStream(file.getBytes()), finalName);//, file.getContentType()
         record.setBlobId(finalName);
         record.setLastModifyDate(System.currentTimeMillis());
-        recordRepo.save(record);
+        Record newRecord = recordRepo.save(record);
 
-        return new CommonResponse(OK, null, null, record);
+        StringBuilder builder = new StringBuilder();
+        builder.append("<script type=\"text/javascript\">");
+        builder.append("window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + "/site/cms/public/file/"+ newRecord.getBlobId() + "','')");
+        builder.append("</script>");
+
+        return builder.toString();
     }
 
     private boolean canAccess(UserInfo userInfo, Record record){

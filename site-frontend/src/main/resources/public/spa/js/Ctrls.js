@@ -39,10 +39,6 @@ app.controller('mainCtrl', function($rootScope, $scope, $state, $log, $timeout, 
         $scope.commonMessage = "";
     };
     
-    $scope.onSwitchRight = function(){
-        $rootScope.$emit(Consts.Event.SwitchRight);  
-    };
-    
     //clean pop data
     $scope.onPopLogin = function(){
         $scope.loginError = "";
@@ -147,12 +143,28 @@ app.controller('mainCtrl', function($rootScope, $scope, $state, $log, $timeout, 
 
 //子controller控制部分内容，并切换
 app.controller('indexMainCtrl', function($rootScope, $scope, $state, $log, $timeout, CmsService, AppService, $) {
+
+    //search for the newest CMS and go
+    CmsService.cms.doRecordSearch({})
+        .then(function(result){
+            if(result.data && result.data.status == Consts.ResponseStatus.OK){
+                $log.info("indexMainCtrl Search success", result);
+                var content = result.data.data.content;
+                if(content && content.length > 0){
+                    $state.go('cmsRecord', { id : content[0].id }, {reload: true});
+                }
+            }else{
+                $rootScope.$emit(Consts.Event.Message, "indexMainCtrl Search:" + Utils.getResponseMessage(result));
+            }
+        }, function(result){
+            $log.warn("indexMainCtrl Search fail", result);
+            $rootScope.$emit(Consts.Event.Message, "onSearch:" + Utils.getResponseMessage(result));
+        });
 });
 
 
-app.controller('cmsMainCtrl', function($rootScope, $scope, $stateParams, $log, $timeout, screenSize, CmsService, AppService, $) {    
+app.controller('cmsMainCtrl', function($rootScope, $scope, $state, $stateParams, $log, $timeout, screenSize, CmsService, AppService, $) {
     //UI
-    $scope.ifShowRight = null;
     //data
     $scope.query = AppService.getSearchParam();
     $scope.searchResult = null;
@@ -177,56 +189,63 @@ app.controller('cmsMainCtrl', function($rootScope, $scope, $stateParams, $log, $
     $scope.onMovePage = function(offset){
         
     };
+
+    $scope.onLoadRecord = function (record) {
+        $log.info("Load Record Page:", record);
+        $state.go('cmsRecord', { id : record.id }, {reload: true});
+    };
     
     //on event
-    var removeMe = $rootScope.$on(Consts.Event.SwitchRight, function(){
-        $log.info("get on " + Consts.Event.SwitchRight);
-        if($scope.ifShowRight){
-            $scope.ifShowRight = false;
-        }else{
-            $scope.ifShowRight = true;
-        }
-    });
-    $scope.$on("$destroy", removeMe);
     
     //init
-    if($scope.ifShowRight === null){
-        if(screenSize.is('xs')){
-            $scope.ifShowRight = false;
-        }else{
-            $scope.ifShowRight = false;
-        }
-    }
 
 });
 
-app.controller('cmsRecordCtrl', function($rootScope, $scope, $stateParams, $log, $timeout, screenSize, CmsService, AppService, $) {
+app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParams, $log, $timeout, screenSize, CmsService, AppService, $, CK) {
     
     //UI
-    $scope.ifShowRight = null;
     $scope.input = {};//newTag:
+    $scope.canEdit = false;
     //data
-    $scope.record = AppService.getRecord();   
+    $scope.record = AppService.getRecord();
+
+    $scope.recordDeleteError = "";
+    $scope.isDeleting = false;
+
+    $scope.htmlEditor = "";
+    $scope.imagePath = "";
+
+    $scope.hasRecord = function () {
+        if(AppService.getRecord() && AppService.getRecord().id){
+            return true;
+        }else{
+            return false;
+        }
+    };
 
     $scope.onSave = function(){
         $log.info("onSave:", $scope.record);
+
+        if(!AppService.getUser()){
+            $rootScope.$emit(Consts.Event.Message, "Not Login Yet");
+            return ;
+        }
+
         //set userinfo if empty
         if(!$scope.record.userId){
             $scope.record.userId = AppService.getUser().id;
             $scope.record.username = AppService.getUser().username;
         }
+
+        //get data
+        $scope.record.content = $scope.editor.getData();
         
         if($scope.input.isPrivate){
             $scope.record.visibility = Consts.Record.Private;
         }else{
             $scope.record.visibility = Consts.Record.Public;
         }
-        
-        if($scope.input.isFile){
-            $scope.record.recordType = Consts.Record.File;
-        }else{
-            $scope.record.recordType = Consts.Record.Article;
-        }
+        $scope.record.recordType = Consts.Record.Article;
         
         CmsService.cms.doRecordUpdate($scope.record)
         .then(function(result){
@@ -234,6 +253,8 @@ app.controller('cmsRecordCtrl', function($rootScope, $scope, $stateParams, $log,
                 $log.info("onSave success", result);
                 $rootScope.$emit(Consts.Event.Message, "onSave Success", 3000, Consts.MessageLevel.Fine);
                 AppService.setRecord(result.data.data);
+                //set state
+                $state.go('cmsRecord', { id : result.data.data.id }, {reload: true});
             }else{
                 $rootScope.$emit(Consts.Event.Message, "onSave:" + Utils.getResponseMessage(result));
             }
@@ -261,37 +282,104 @@ app.controller('cmsRecordCtrl', function($rootScope, $scope, $stateParams, $log,
             }
         }
     };
-    
-    
-    //on event
-    var removeSwitch = $rootScope.$on(Consts.Event.SwitchRight, function(){
-        $log.info("get on " + Consts.Event.SwitchRight);
-        if($scope.ifShowRight){
-            $scope.ifShowRight = false;
+
+    $scope.onPopDelete = function(){
+        $scope.recordDeleteError = "";
+    };
+
+    $scope.onDelete = function(){
+        $log.info("Delete:" + AppService.getRecord().id);
+        //reset ui var
+        $scope.isDeleting = true;
+        $scope.loginError = "";
+
+        CmsService.cms.doRecordDelete(AppService.getRecord().id)
+            .then(function(result){
+                if(result.data && result.data.status == Consts.ResponseStatus.OK){
+                    $log.info("onDelete success", result);
+                    //AppService.setRecord(null);
+                    $state.go("cmsMain", {}, {reload: true});
+                    //close modal
+                    $rootScope.$emit(Consts.Event.Message, "Delete Success", 3000, Consts.MessageLevel.Fine);
+                    $('#recordDeleteModal').modal('hide');
+                }else{
+                    $scope.recordDeleteError = Utils.getResponseMessage(result);
+                }
+            },function(result){
+                $log.warn("Delete fail", result);
+                $scope.loginError = Utils.getResponseMessage(result);
+            }).finally(function(){
+            $scope.isDeleting = false;
+        });
+    };
+
+    var setupEditor = function(){
+        $scope.editor = CK.inline("contentEditor", {
+            filebrowserBrowseUrl: CmsService.cms.getFileBrowserPath(),
+            filebrowserUploadUrl: CmsService.cms.getFileUploadPath()
+        });
+        $scope.$on("$destroy", function () {
+            $scope.editor.destroy();
+        });
+    };
+
+    var checkCanEdit = function(){
+        var record = AppService.getRecord();
+        var currentUser = AppService.getUser();
+        if(currentUser && record && (currentUser.role == Consts.Role.Admin ||  currentUser.id == record.userId || !record.id )){
+            $scope.canEdit = true;
         }else{
-            $scope.ifShowRight = true;
+            $scope.canEdit = false;
         }
+    };
+
+    //on event
+    var userChange = $rootScope.$on(Consts.Event.UserChange, function(e, userInfo){
+        $log.info("get on " + Consts.Event.UserChange, userInfo);
+        checkCanEdit();
     });
-    $scope.$on("$destroy", removeSwitch);
-    
+    $scope.$on("$destroy", userChange);
+
     var removeRecord = $rootScope.$on(Consts.Event.RecordLoaded, function(e, newRecord){
         $log.info("get on " + Consts.Event.RecordLoaded, newRecord);
         $scope.record = newRecord;
+        if(newRecord.recordType == "File"){
+            $scope.imagePath = Consts.ImageRoot + newRecord.blobId;
+        }else{
+            setupEditor();
+            $scope.editor.setData(newRecord.content);
+        }
     });
     $scope.$on("$destroy", removeRecord);
+
     
     //init
-    if($scope.ifShowRight === null){
-        if(screenSize.is('xs')){
-            $scope.ifShowRight = false;
-        }else{
-            $scope.ifShowRight = false;
+
+    if($stateParams.id){
+        $log.info("load record:" + $stateParams.id);
+        CmsService.cms.doRecordGet($stateParams.id)
+        .then(function(result){
+            if(result.data && result.data.status == Consts.ResponseStatus.OK){
+                $log.info("load record success", result);
+                var record = result.data.data;
+                AppService.setRecord(record);
+                //set canEdit
+                checkCanEdit();
+            }else{
+                $rootScope.$emit(Consts.Event.Message, "load record:" + Utils.getResponseMessage(result));
+            }
+        }, function(result){
+            $log.warn("load record fail", result);
+            $rootScope.$emit(Consts.Event.Message, "load record:" + Utils.getResponseMessage(result));
+        });
+    }else{
+        if(!AppService.getRecord()){
+            AppService.setRecord(new Record());
         }
+        setupEditor();
     }
-    
-    if(!AppService.getRecord()){
-        AppService.setRecord(new Record());
-    }
-    
+
+
+    $log.info("Record Page Loaded", $stateParams);
 });
 

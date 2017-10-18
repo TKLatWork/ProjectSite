@@ -1,6 +1,10 @@
 var app = angular.module('webCmsApp', ['ui.router', 'matchMedia']);
 
 app.service('$',function(){return $;});
+app.service('CK',function () {return CKEDITOR;});
+
+app.config(function($httpProvider) {
+});
 
 app.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
@@ -11,7 +15,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
         templateUrl: "template/cms-main.html",
         controller: "cmsMainCtrl"
     }).state('cmsRecord', {
-        url: "/cms/record",
+        url: "/cms/record/{id}",
+        params : {
+            id : null
+        },
         templateUrl: "template/cms-record.html",
         controller: "cmsRecordCtrl"
     }).state('index', {
@@ -51,15 +58,21 @@ var Utils = {
 };
 
 var Consts = {
+    ImageRoot: "/site/cms/public/file/",
     ResponseStatus : {
         OK : "OK",
         Exception : "Exception",
         Fail : "Fail"
     },
+    Role : {
+        Admin : "Admin",
+        User : "User"
+    },
     Event : {
         Message : "Message",
         SwitchRight : "SwitchRight",
-        RecordLoaded : "RecordLoaded"
+        RecordLoaded : "RecordLoaded",
+        UserChange : "UserChange"
     },
     MessageLevel : {
         Fine : "fine",

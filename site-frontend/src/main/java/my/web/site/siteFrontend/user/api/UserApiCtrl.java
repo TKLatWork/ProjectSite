@@ -41,6 +41,7 @@ public class UserApiCtrl {
     public static final String LOGOUT = "/public/logout";
     public static final String LOGOUT_SUCCESS = "/public/logoutSuccess";
     public static final String ADMIN_DUMMY = "/admin/dummy";
+    public static final String ACCESS_DENIED = "/public/403";
 
     @Autowired
     private UserInfoRepo userInfoRepo;
@@ -98,5 +99,13 @@ public class UserApiCtrl {
         return response;
     }
 
-
+    @RequestMapping(ACCESS_DENIED)
+    @ResponseBody
+    public CommonResponse on403() {
+        //for test case
+        CommonResponse response = new CommonResponseBuilder().createCommonResponse();
+        response.setStatus(CommonsValues.ResponseStatus.Fail);
+        response.setMessage("ACCESS_DENIED");
+        return response;
+    }
 }

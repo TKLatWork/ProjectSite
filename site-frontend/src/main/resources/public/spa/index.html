@@ -15,6 +15,10 @@
     
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.bootcss.com/ckeditor/4.7.3/ckeditor.js"></script>
+    <script src="lib/config.js"></script>
+
     <!--......... -->
     <script src="js/main.js"></script>
     <script src="js/Ctrls.js"></script>
@@ -23,6 +27,7 @@
     
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/ckeditor/4.7.3/contents.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
 </head>
 <body ng-controller="mainCtrl">
@@ -55,11 +60,6 @@
                     <li ng-hide="!hasLogin()" ng-click="onLogout()"><a>Logout</a></li>
                 </ul>
             </div>
-            
-            <!-- 右菜单 -->
-            <div class="btn-group dropup">
-                <button type="button" class="btn btn-info" ng-click="onSwitchRight()" aria-hidden="true"><span class="glyphicon glyphicon-list"></span></button>
-            </div>
         </div>
     </div>
 
@@ -73,26 +73,6 @@
             </div>
             <div class="modal-body">
                 <input class="form-control input-lg" type="text" placeholder="Username" ng-model="inUsername">
-                <input class="form-control input-lg" type="password" placeholder="Password" ng-model="inPassword">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-block" ng-disabled="isLogining" ng-click="onLogin()">Submit</button>
-                <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-    </div>
-    
-    <!-- new ArticleModal -->
-    <div class="modal fade" id="newArticleModal" role="dialog">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">New Article</h4>
-                <div ng-click="cleanNewArticleError()" ng-hide="!newArticleError" class="btn btn-block btn-danger clean-bottom-margin">{{newArticleError}}</div>
-            </div>
-            <div class="modal-body">
-                <input class="form-control input-lg" type="text" placeholder="Article Name" ng-model="inArticleName">
                 <input class="form-control input-lg" type="password" placeholder="Password" ng-model="inPassword">
             </div>
             <div class="modal-footer">
