@@ -36,7 +36,7 @@
         <p>Record Info</p>
         <img ng-show="record.blobId" src="{{imagePath}}" />
 
-        <textarea class="ckeditor" name="contentEditor"></textarea>
+        <textarea ng-hide="record.blobId" class="ckeditor" name="contentEditor"></textarea>
     </div>
 </div>
 
