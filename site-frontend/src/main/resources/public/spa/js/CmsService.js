@@ -1,6 +1,6 @@
 app.factory("CmsService", function($http, $q, $){
     var config = {
-        root : "http://localhost/site",
+        root : "/site",
         user:{
             current : "/user/public/current",
             login : "/user/public/login",
