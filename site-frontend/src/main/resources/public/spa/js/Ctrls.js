@@ -316,13 +316,15 @@ app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParam
     };
 
     var setupEditor = function(){
-        $scope.editor = CK.inline("contentEditor", {
-            filebrowserBrowseUrl: CmsService.cms.getFileBrowserPath(),
-            filebrowserUploadUrl: CmsService.cms.getFileUploadPath()
-        });
-        $scope.$on("$destroy", function () {
-            $scope.editor.destroy();
-        });
+        if(!$scope.editor){
+            $scope.editor = CK.inline("contentEditor", {
+                filebrowserBrowseUrl: CmsService.cms.getFileBrowserPath(),
+                filebrowserUploadUrl: CmsService.cms.getFileUploadPath()
+            });
+            $scope.$on("$destroy", function () {
+                $scope.editor.destroy();
+            });
+        }
     };
 
     var checkCanEdit = function(){
