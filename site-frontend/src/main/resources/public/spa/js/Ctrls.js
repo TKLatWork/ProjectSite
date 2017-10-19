@@ -4,8 +4,7 @@ app.controller('mainCtrl', function($rootScope, $scope, $state, $log, $timeout, 
     //UI control
     $scope.inUsername = "";
     $scope.inPassword = "";
-    
-    
+
     $scope.commonMessage = "";
     $scope.commonMessageLevel = Consts.MessageLevel.Alert;
     $scope.loginError = "";
@@ -27,7 +26,8 @@ app.controller('mainCtrl', function($rootScope, $scope, $state, $log, $timeout, 
     };
 
     $scope.hasLogin = function(){
-        return AppService.getUser()? true:false;
+        var result = AppService.getUser()? true:false;
+        return result;
     };
     
     //from UI
@@ -103,6 +103,8 @@ app.controller('mainCtrl', function($rootScope, $scope, $state, $log, $timeout, 
             $rootScope.$emit(Consts.Event.Message, "onLogout:" + Utils.getResponseMessage(result));
         });
     };
+
+    //event
     
     //sub ctrl control
     $scope.onLoadCms = function(){

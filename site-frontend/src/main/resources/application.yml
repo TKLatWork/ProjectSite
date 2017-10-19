@@ -17,7 +17,7 @@ server:
   port: 80
   contextPath: /site
 
-logging.level.root: DEBUG
+logging.level.root: WARN
 
 app.siteFrontend:
   appConfig:

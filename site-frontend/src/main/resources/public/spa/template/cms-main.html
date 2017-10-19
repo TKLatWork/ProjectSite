@@ -24,7 +24,7 @@
         </nav>
         
         <ul class="list-group" >
-            <li class="list-group-item" ng-repeat="record in searchResult.content" ng-click="onLoadRecord(record)">{{record.name}} Category:{{record.category}}, Author:{{record.username}}</li>
+            <li class="list-group-item" ng-repeat="record in searchResult.content" ng-click="onLoadRecord(record)">{{record.name}} Category:{{record.category}}, Author:{{record.username}}, Date:{{record.createDate| date:'yyyy-MM-dd'}}</li>
         </ul>
     </div>
 </div>

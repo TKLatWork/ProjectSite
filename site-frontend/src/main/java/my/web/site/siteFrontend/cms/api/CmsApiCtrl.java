@@ -250,6 +250,7 @@ public class CmsApiCtrl {
         record.setUserId(userInfo.getId());
         record.setRecordType(ConstValues.RecordType.File);
         record.setVisibility(ConstValues.Visibility.Public);
+        record.setCreateDate(System.currentTimeMillis());
 
         String finalName = CmsUtil.genFileName(file.getOriginalFilename());
         gridFsTemplate.store(new ByteArrayInputStream(file.getBytes()), finalName);//, file.getContentType()
