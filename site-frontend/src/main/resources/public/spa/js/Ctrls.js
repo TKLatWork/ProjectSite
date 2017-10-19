@@ -315,32 +315,47 @@ app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParam
         });
     };
 
-    var setupEditor = function(){
+    var setupEditor = function(canEdit, setContent){
         if(!$scope.editor){
             $scope.editor = CK.inline("contentEditor", {
                 filebrowserBrowseUrl: CmsService.cms.getFileBrowserPath(),
                 filebrowserUploadUrl: CmsService.cms.getFileUploadPath()
             });
+            $scope.editor.setData(setContent);
             $scope.$on("$destroy", function () {
-                $scope.editor.destroy();
+                if($scope.editor){
+                    $scope.editor.destroy();
+                }
             });
         }
+
+        CK.on( 'instanceReady', function( evt ) {
+            if(canEdit){
+                evt.editor.setReadOnly(false);
+            }else{
+                evt.editor.setReadOnly(true);
+            }
+        });
     };
 
-    var checkCanEdit = function(){
+    var checkCanEditAndEditor = function(){
         var record = AppService.getRecord();
         var currentUser = AppService.getUser();
-        if(currentUser && record && (currentUser.role == Consts.Role.Admin ||  currentUser.id == record.userId || !record.id )){
-            $scope.canEdit = true;
-        }else{
-            $scope.canEdit = false;
+
+        if(record){
+            if(currentUser && (currentUser.role == Consts.Role.Admin ||  currentUser.id == record.userId || !record.id )){
+                $scope.canEdit = true;
+            }else{
+                $scope.canEdit = false;
+            }
+            setupEditor($scope.canEdit, record.content);
         }
     };
 
     //on event
     var userChange = $rootScope.$on(Consts.Event.UserChange, function(e, userInfo){
         $log.info("get on " + Consts.Event.UserChange, userInfo);
-        checkCanEdit();
+        checkCanEditAndEditor();
     });
     $scope.$on("$destroy", userChange);
 
@@ -350,8 +365,7 @@ app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParam
         if(newRecord.recordType == "File"){
             $scope.imagePath = Consts.ImageRoot + newRecord.blobId;
         }else{
-            setupEditor();
-            $scope.editor.setData(newRecord.content);
+            checkCanEditAndEditor();
         }
     });
     $scope.$on("$destroy", removeRecord);
@@ -367,8 +381,6 @@ app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParam
                 $log.info("load record success", result);
                 var record = result.data.data;
                 AppService.setRecord(record);
-                //set canEdit
-                checkCanEdit();
             }else{
                 $rootScope.$emit(Consts.Event.Message, "load record:" + Utils.getResponseMessage(result));
             }
@@ -380,8 +392,7 @@ app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParam
         if(!AppService.getRecord()){
             AppService.setRecord(new Record());
         }
-        setupEditor();
-        checkCanEdit();
+        checkCanEditAndEditor();
     }
 
 
