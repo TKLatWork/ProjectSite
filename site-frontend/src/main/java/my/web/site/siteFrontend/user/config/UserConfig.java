@@ -22,13 +22,20 @@ public class UserConfig {
 
     @PostConstruct
     public void setup(){
-        if(userInfoRepo.findByUsername(appConfig.getAdminUserName()) == null) {
+        UserInfo currentAdmin = userInfoRepo.findByUsername(appConfig.getAdminUserName());
+        if(currentAdmin == null) {
+            //create new admin
             UserInfo userInfo = new UserInfo();
             userInfo.setUsername(appConfig.getAdminUserName());
             userInfo.setPassword(passwordEncoder.encode(appConfig.getAdminPassword()));
             userInfo.setRole(ConstValues.Role.Admin);
 
             userInfoRepo.save(userInfo);
+        }else{
+            //set password to
+            currentAdmin.setPassword(passwordEncoder.encode(appConfig.getAdminPassword()));
+            currentAdmin.setRole(ConstValues.Role.Admin);
+            userInfoRepo.save(currentAdmin);
         }
     }
 
