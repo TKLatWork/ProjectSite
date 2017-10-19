@@ -381,6 +381,7 @@ app.controller('cmsRecordCtrl', function($rootScope, $state, $scope, $stateParam
             AppService.setRecord(new Record());
         }
         setupEditor();
+        checkCanEdit();
     }
 
 
