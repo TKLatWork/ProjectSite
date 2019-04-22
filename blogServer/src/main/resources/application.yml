@@ -1,0 +1,10 @@
+server:
+  port: 80
+  servlet:
+    context-path: /blog
+
+spring:
+  application:
+    name: blog
+  profiles:
+    active: dev
