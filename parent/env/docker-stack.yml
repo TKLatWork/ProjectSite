@@ -1,0 +1,19 @@
+version: '3'
+    
+volumes:
+  mongodb:
+
+services:
+
+  #https://github.com/bitnami/bitnami-docker-mongodb
+  mongodb:
+    image: 'bitnami/mongodb:4.0.9-r11'
+    environment:
+      - MONGODB_ROOT_PASSWORD=123
+      - MONGODB_USERNAME=user
+      - MONGODB_PASSWORD=123
+      - MONGODB_DATABASE=search
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb:/bitnami
