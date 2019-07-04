@@ -1,7 +1,3 @@
-# app
-
-    19/7/1 重建
-
 ## Project setup
 ```
 npm install
