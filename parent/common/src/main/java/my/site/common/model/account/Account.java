@@ -15,7 +15,7 @@ public class Account {
     private String accountName;
     private String password;
     @ApiModelProperty("角色，（权限）")
-    private List<String> roles;
+    private List<String> auth;
     private Long lastLogin;
 
 }

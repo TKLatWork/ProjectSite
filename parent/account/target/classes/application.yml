@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /site
+
+#CommonsRequestLoggingFilter 需要这个
+logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+spring:
+  application:
+    name: site
+  profiles:
+    active: dev
+
+app.auth:
+  secret: "qefrd123"
+  expirationTime: 432_000_000
+
+
+---
+
+spring:
+  profiles: dev
+  data:
+    mongodb:
+      uri: mongodb://admin:123@192.168.200.212:27017/site
+      database: site

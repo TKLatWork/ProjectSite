@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: site
+  cloud:
+    consul:
+      host: 192.168.200.212
+      port: 8500
+      discovery:
+        heartbeat:
+          enabled: true
+        prefer-ip-address: true
+        #ip-address: 192.168.200.76
+
