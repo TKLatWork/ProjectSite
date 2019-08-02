@@ -25,9 +25,9 @@ public class AccountCtrl implements AccountApi {
     private JwtTokenProvider jwtTokenProvider;
 
 
-    @GetMapping("/{id}")
-    public Account get(@PathVariable String id) {
-        return null;
+    @GetMapping("/{accountName}")
+    public Account get(@PathVariable String accountName) {
+        return accountService.getAccountByAccountName(accountName);
     }
 
     @Override

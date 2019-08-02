@@ -13,6 +13,8 @@ spring:
     active: dev
 
 app.auth:
+  adminAccountName: "admin"
+  adminPassword: "123"
   secret: "qefrd123"
   expirationTime: 432_000_000
 
@@ -23,5 +25,5 @@ spring:
   profiles: dev
   data:
     mongodb:
-      uri: mongodb://admin:123@192.168.200.212:27017/site
-      database: site
+      uri: mongodb://admin:123@192.168.200.212:27017/db
+      database: db

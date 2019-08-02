@@ -11,7 +11,7 @@ public class AuthConfig {
 
     private String secret;//JWT的密匙
     private Long expirationTime;//过期时间
-    private final String adminUsername = "admin";
+    private final String adminAccountName = "admin";
     private String adminPassword;
 
 }

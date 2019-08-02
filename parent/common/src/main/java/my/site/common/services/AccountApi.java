@@ -16,7 +16,7 @@ public interface AccountApi {
      * @param id 空时获取当前账号
      * @return
      */
-    Account get(String id);
+    Account get(String id) throws ApiException;
 
     Account update(Account account);
 

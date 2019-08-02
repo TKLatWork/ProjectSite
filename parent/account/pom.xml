@@ -12,6 +12,7 @@
     <artifactId>account</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>my.site</groupId>
             <artifactId>common</artifactId>
@@ -34,7 +35,6 @@
         </dependency>
 
         <!-- auth -->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -44,6 +44,17 @@
             <artifactId>jjwt</artifactId>
             <version>0.7.0</version>
         </dependency>
+        <!-- auth -->
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <!-- use 2.9.1 for Java 7 projects -->
+            <version>3.11.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- test -->
 
     </dependencies>
 

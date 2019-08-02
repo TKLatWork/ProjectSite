@@ -8,7 +8,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@ControllerAdvice(basePackages = "my.site.ctrl.*Ctrl")
+
+@ControllerAdvice(basePackages = "my.site.account.ctrl")
 public class ApiRespAdvice implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter methodParameter, Class aClass) {
